@@ -1613,7 +1613,17 @@ void Bullet_Fire_Extended( gentity_t *source, gentity_t *attacker, vec3_t start,
 
 	damage *= s_quadFactor;
 
+	//unlagged - backward reconciliation #2
+	// backward-reconcile the other clients
+	G_DoTimeShiftFor( attacker );
+	//unlagged - backward reconciliation #2
+
 	G_HistoricalTrace( source, &tr, start, NULL, NULL, end, source->s.number, MASK_SHOT );
+
+	//unlagged - backward reconciliation #2
+	// put them back
+	G_UndoTimeShiftFor( attacker );
+	//unlagged - backward reconciliation #2
 
 	// DHM - Nerve :: only in single player
 	if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
@@ -1941,6 +1951,11 @@ void VenomPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 	PerpendicularVector( right, forward );
 	CrossProduct( forward, right, up );
 
+	//unlagged - backward reconciliation #2
+	// backward-reconcile the other clients
+	G_DoTimeShiftFor( ent );
+	//unlagged - backward reconciliation #2
+
 	oldScore = ent->client->ps.persistant[PERS_SCORE];
 
 	// generate the "random" spread pattern
@@ -1955,6 +1970,11 @@ void VenomPattern( vec3_t origin, vec3_t origin2, int seed, gentity_t *ent ) {
 			ent->client->ps.persistant[PERS_ACCURACY_HITS]++;
 		}
 	}
+
+	//unlagged - backward reconciliation #2
+	// put them back
+	G_UndoTimeShiftFor( ent );
+	//unlagged - backward reconciliation #2
 }
 
 /*

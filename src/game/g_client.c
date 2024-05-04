@@ -1382,6 +1382,21 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->pers.predictItemPickup = qtrue;
 	}
 
+//unlagged - client options
+	// see if the player has opted out
+	//s = Info_ValueForKey( userinfo, "cg_delag" );
+	//if ( !atoi( s ) ) {
+		client->pers.delag = 1;
+	//} else {
+	//	client->pers.delag = atoi( s );
+	//}
+
+	// see if the player is nudging his shots
+	//s = Info_ValueForKey( userinfo, "cg_cmdTimeNudge" );
+	//client->pers.cmdTimeNudge = atoi( s );
+	client->pers.cmdTimeNudge = 0;
+//unlagged - client options
+
 	// check the auto activation
 	s = Info_ValueForKey( userinfo, "cg_autoactivate" );
 	if ( !atoi( s ) ) {
@@ -1639,6 +1654,16 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	// count current clients and rank for scoreboard
 	CalculateRanks();
 
+	//unlagged - backward reconciliation #5
+	// announce it
+	if ( g_delagHitscan.integer ) {
+		trap_SendServerCommand( clientNum, "print \"This server is Unlagged: full lag compensation is ON!\n\"" );
+	}
+	else {
+		trap_SendServerCommand( clientNum, "print \"This server is Unlagged: full lag compensation is OFF!\n\"" );
+	}
+	//unlagged - backward reconciliation #5
+
 	return NULL;
 }
 
@@ -1860,6 +1885,13 @@ void ClientSpawn( gentity_t *ent, qboolean revived ) {
 	// toggle the teleport bit so the client knows to not lerp
 	flags = ent->client->ps.eFlags & EF_TELEPORT_BIT;
 	flags ^= EF_TELEPORT_BIT;
+
+	//unlagged - backward reconciliation #3
+	// we don't want players being backward-reconciled to the place they died
+	G_ResetHistory( ent );
+	// and this is as good a time as any to clear the saved state
+	ent->client->saved.leveltime = 0;
+	//unlagged - backward reconciliation #3
 
 	// clear everything but the persistant data
 
