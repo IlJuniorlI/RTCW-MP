@@ -250,19 +250,27 @@ except for "skip"
 =====================
 */
 void G_TimeShiftAllClients( int time, gentity_t *skip ) {
-	int			i;
-	gentity_t	*ent;
-	//qboolean debug = ( skip != NULL && skip->client && 
-	//		skip->client->pers.debugDelag && skip->s.weapon == WP_RAILGUN );
-	qboolean debug = qfalse;
+    int            i;
+    gentity_t    *ent;
+    qboolean debug = ( skip != NULL && skip->client ); //&& skip->client->pers.debugDelag
 
-	// for every client
-	ent = &g_entities[0];
-	for ( i = 0; i < MAX_CLIENTS; i++, ent++ ) {
-		if ( ent->client && ent->inuse && ent->client->sess.sessionTeam < TEAM_SPECTATOR && ent != skip ) {
-			G_TimeShiftClient( ent, time, debug, skip );
-		}
-	}
+    // for every client
+    ent = &g_entities[0];
+    for ( i = 0; i < MAX_CLIENTS; i++, ent++ ) {
+        if ( ent->client
+                && ent->inuse
+                && ent->client->sess.sessionTeam < TEAM_SPECTATOR
+                && ent != skip
+                && ent->health > 0
+                && !(ent->client->ps.pm_flags & PMF_LIMBO)
+                // do not timeshift eliminated clients, as
+                // G_TimeShiftClient() will re-link them when
+                // they're supposed to stay unlinked
+                //&& !ent->client->isEliminated
+                ) {
+            G_TimeShiftClient( ent, time, debug, skip );
+        }
+    }
 }
 
 
@@ -332,15 +340,21 @@ except for "skip"
 =======================
 */
 void G_UnTimeShiftAllClients( gentity_t *skip ) {
-	int			i;
-	gentity_t	*ent;
+    int            i;
+    gentity_t    *ent;
 
-	ent = &g_entities[0];
-	for ( i = 0; i < MAX_CLIENTS; i++, ent++) {
-		if ( ent->client && ent->inuse && ent->client->sess.sessionTeam < TEAM_SPECTATOR && ent != skip ) {
-			G_UnTimeShiftClient( ent );
-		}
-	}
+    ent = &g_entities[0];
+    for ( i = 0; i < MAX_CLIENTS; i++, ent++) {
+        if ( ent->client 
+            && ent->inuse
+            && ent->client->sess.sessionTeam < TEAM_SPECTATOR
+            && ent != skip
+            && ent->health > 0
+            && !(ent->client->ps.pm_flags & PMF_LIMBO)
+            ){
+                G_UnTimeShiftClient( ent );
+        }
+    }
 }
 
 
