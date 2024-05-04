@@ -855,6 +855,31 @@ void G_ArmorDamage( gentity_t *targ ) {
 }
 
 /*
+==============
+G_Hitsound
+==============
+*/
+void G_Hitsound( gentity_t *self, gentity_t *attacker, qboolean tm, qboolean hs ) {
+
+	if ( !self || !attacker || !self->client || !attacker->client ) return;
+
+	if ( self->client == attacker->client ) return;	// self inflicted damage
+
+	if ( tm ) {
+		// team damage
+		G_AddEvent( self, EV_GENERAL_SOUND, G_SoundIndex( "sound/hitsound/team.wav" ) );
+	} else if ( attacker->s.number != ENTITYNUM_NONE && attacker->s.number != ENTITYNUM_WORLD ) {
+		if ( hs ) {
+			// headshot damage
+			G_AddEvent( self, EV_GENERAL_SOUND, G_SoundIndex( "sound/hitsound/head.wav" ) );
+		} else {
+			// nomral damage
+			G_AddEvent( self, EV_GENERAL_SOUND, G_SoundIndex( "sound/hitsound/body.wav" ) );
+		}
+	}
+}
+
+/*
 ============
 T_Damage
 
@@ -885,6 +910,7 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 	int save;
 	int asave;
 	int knockback;
+	qboolean headshot = qfalse;
 
 	if ( !targ->takedamage ) {
 		return;
@@ -1128,6 +1154,9 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 		// set the last client who damaged the target
 		targ->client->lasthurt_client = attacker->s.number;
 		targ->client->lasthurt_mod = mod;
+
+		// play hitsound
+		if ( attacker->client ) G_Hitsound(targ, attacker, OnSameTeam( targ, attacker ), headshot);
 	}
 
 	// do the damage
