@@ -62,6 +62,7 @@ $env = new cons(
   ../game/g_tramcar.c
   ../game/g_trigger.c
   ../game/g_utils.c
+  ../game/g_unlagged.c
   ../game/g_vehicles.c
   ../game/g_weapon.c
   ../game/q_math.c
