@@ -1107,6 +1107,8 @@ void G_Damage( gentity_t *targ, gentity_t *inflictor, gentity_t *attacker,
 
 	if ( IsHeadShot( targ, qfalse, dir, point, mod ) ) {
 
+		headshot = qtrue;
+
 		if ( take * 2 < 50 ) { // head shots, all weapons, do minimum 50 points damage
 			take = 50;
 		} else {

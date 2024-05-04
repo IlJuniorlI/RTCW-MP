@@ -252,7 +252,7 @@ except for "skip"
 void G_TimeShiftAllClients( int time, gentity_t *skip ) {
     int            i;
     gentity_t    *ent;
-    qboolean debug = ( skip != NULL && skip->client ); //&& skip->client->pers.debugDelag
+    qboolean debug = ( skip != NULL && skip->client && skip->client->pers.debugDelag ); //&& skip->client->pers.debugDelag
 
     // for every client
     ent = &g_entities[0];
