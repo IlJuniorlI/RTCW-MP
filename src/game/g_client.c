@@ -1395,6 +1395,15 @@ void ClientUserinfoChanged( int clientNum ) {
 	//s = Info_ValueForKey( userinfo, "cg_cmdTimeNudge" );
 	//client->pers.cmdTimeNudge = atoi( s );
 	client->pers.cmdTimeNudge = 0;
+
+	// see if the player wants to debug the backward reconciliation
+	//s = Info_ValueForKey( userinfo, "cg_debugDelag" );
+	//if ( !atoi( s ) ) {
+		client->pers.debugDelag = qfalse;
+	//}
+	//else {
+	//	client->pers.debugDelag = qtrue;
+	//}
 //unlagged - client options
 
 	// check the auto activation

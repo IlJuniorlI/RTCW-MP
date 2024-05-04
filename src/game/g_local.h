@@ -516,6 +516,7 @@ typedef struct {
 	// these correspond with variables in the userinfo string
 	int			delag;
 	int			cmdTimeNudge;
+	int			debugDelag;
 	//unlagged - client options
 
 	//unlagged - true ping
