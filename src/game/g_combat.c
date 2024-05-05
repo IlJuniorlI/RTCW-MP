@@ -867,14 +867,14 @@ void G_Hitsound( gentity_t *self, gentity_t *attacker, qboolean tm, qboolean hs 
 
 	if ( tm ) {
 		// team damage
-		G_AddEvent( self, EV_GENERAL_SOUND, G_SoundIndex( "sound/hitsound/team.wav" ) );
+		G_AddEvent( self, EV_GLOBAL_CLIENT_SOUND, G_SoundIndex( "sound/hitsound/team.wav" ) );
 	} else if ( attacker->s.number != ENTITYNUM_NONE && attacker->s.number != ENTITYNUM_WORLD ) {
 		if ( hs ) {
 			// headshot damage
-			G_AddEvent( self, EV_GENERAL_SOUND, G_SoundIndex( "sound/hitsound/head.wav" ) );
+			G_AddEvent( self, EV_GLOBAL_CLIENT_SOUND, G_SoundIndex( "sound/hitsound/head.wav" ) );
 		} else {
 			// nomral damage
-			G_AddEvent( self, EV_GENERAL_SOUND, G_SoundIndex( "sound/hitsound/body.wav" ) );
+			G_AddEvent( self, EV_GLOBAL_CLIENT_SOUND, G_SoundIndex( "sound/hitsound/body.wav" ) );
 		}
 	}
 }
