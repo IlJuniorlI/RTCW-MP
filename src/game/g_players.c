@@ -686,9 +686,9 @@ void pCmd_pauseHandle(gentity_t *ent, qboolean dPause) {
 		teamInfo[TEAM_BLUE].team_lock = qtrue;
 	}
 
-    if (g_gameStatslog.integer) {
+    /*if (g_gameStatslog.integer) {
         G_writeGeneralEvent (ent , ent, " ", (dPause) ? eventUnpause : eventPause);  // might want to distinguish between player and admin here?
-    }
+    }*/
 	return;
 }
 
@@ -759,14 +759,14 @@ void G_weaponStats_cmd( gentity_t *ent ) {
 	G_statsPrint( ent, 0 );
 }
 
-void G_draw_hitboxes( gentity_t* ent ) {
+/*void G_draw_hitboxes( gentity_t* ent ) {
 	if (!g_drawHitboxes.integer) {
 		CP("cp \"g_drawHitboxes is disabled.\n\"");
 		return;
 	}
 
 	ent->client->pers.drawHitBoxes = !ent->client->pers.drawHitBoxes;
-}
+}*/
 
 /******************* Client commands *******************/
 qboolean playerCmds (gentity_t *ent, char *cmd ) {

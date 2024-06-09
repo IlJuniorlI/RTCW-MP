@@ -195,6 +195,14 @@ typedef enum {
 #define CGF_PREDICTITEMS    0x08
 //
 
+#define CS_REINFSEEDS			39
+#define CS_PAUSED				40
+#define CS_READY				41
+#define CS_SVCVAR               42		// RTCWPro - Cvar limiting
+#define CS_SERVERTOGGLES        43      // Shows current enable/disabled settings (for voting UI)
+#define CS_MATCHID              44    // match id for stats
+#define CS_ROUNDINFO            45    // match id for stats
+
 #if ( CS_MAX ) > MAX_CONFIGSTRINGS
 #error overflow: (CS_MAX) > MAX_CONFIGSTRINGS
 #endif
@@ -455,7 +463,8 @@ typedef enum {
 	PW_BLUEFLAG,
 	PW_BALL,
 
-	PW_NUM_POWERUPS
+	PW_NUM_POWERUPS,
+	PW_READY,			// Ready
 } powerup_t;
 
 typedef enum {
@@ -1765,3 +1774,11 @@ typedef struct weap_ws_convert_s {
 	extWeaponStats_t iWS;
 } weap_ws_convert_t;
 // OSP
+
+// -OSPx
+// L0 - Reinforcements offset
+#define MAX_REINFSEEDS  8
+//#define REINF_RANGE     16      // (0 to n-1 second offset)
+#define REINF_BLUEDELT  3       // Allies shift offset
+#define REINF_REDDELT   2       // Axis shift offset
+extern const unsigned int aReinfSeeds[MAX_REINFSEEDS];

@@ -188,6 +188,35 @@ vmCvar_t g_gamestate;
 vmCvar_t g_swapteams;
 // -NERVE - SMF
 
+vmCvar_t g_spawnOffset;
+
+// Match specific
+vmCvar_t g_tournament;	// Ready-unready system
+vmCvar_t g_ltNades;			// Number of nades a lt starts with
+vmCvar_t g_medicNades;		// Number of nades a med starts with
+vmCvar_t g_soldNades;		// Number of nades sold starts with
+vmCvar_t g_engNades;		// Number of nades eng starts with
+vmCvar_t g_medicClips;		// Number of clips in weapon med starts with
+vmCvar_t g_engineerClips;	// Number of clips in weapon eng starts with
+vmCvar_t g_soldierClips;	// Number of clips in weapon sold starts with
+vmCvar_t g_leutClips;		// Number of clips in weapon leut starts with
+vmCvar_t g_pistolClips;		// How many clips pistol gets
+vmCvar_t g_maxTeamPF;		// Max Pf's per team
+vmCvar_t g_maxTeamSniper;	// Max snipers per team
+vmCvar_t g_maxTeamVenom;	// Max venoms per team
+vmCvar_t g_maxTeamFlamer;	// Max flamers per team
+
+vmCvar_t match_warmupDamage;
+vmCvar_t match_mutespecs;
+vmCvar_t match_latejoin;
+vmCvar_t match_minplayers;
+vmCvar_t match_readypercent;
+vmCvar_t match_timeoutlength;
+vmCvar_t match_timeoutcount;
+
+vmCvar_t g_allowPMs;		// Allow private messages
+vmCvar_t team_nocontrols;
+
 cvarTable_t gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
@@ -333,6 +362,31 @@ cvarTable_t gameCvarTable[] = {
 
 	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse },
 	{ &g_usePreciseConsoleTime, "g_usePreciseConsoleTime", "1", CVAR_WOLFINFO, 0, qfalse  },
+	{ &g_spawnOffset, "g_spawnOffset", "9", CVAR_ARCHIVE, 0, qfalse, qfalse },
+	{ &g_ltNades, "g_ltNades", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_medicNades, "g_medicNades", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_engNades, "g_engNades", "8", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_soldNades, "g_soldNades", "4", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_medicClips, "g_medicClips", "0", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_engineerClips, "g_engineerClips", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_soldierClips, "g_soldierClips", "2", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_leutClips, "g_leutClips", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_pistolClips, "g_pistolClips", "3", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_maxTeamPF, "g_maxTeamPF", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_maxTeamSniper, "g_maxTeamSniper", "-1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_maxTeamVenom, "g_maxTeamVenom", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_maxTeamFlamer, "g_maxTeamFlamer", "1", CVAR_ARCHIVE | CVAR_LATCH, 0, qtrue },
+	{ &g_tournament, "g_tournament", "0", CVAR_ARCHIVE | CVAR_LATCH | CVAR_SERVERINFO, 0, qtrue },
+	{ &match_warmupDamage, "match_warmupDamage", "1", 0, 0, qfalse },
+	{ &match_mutespecs, "match_mutespecs", "0", 0, 0, qfalse, qtrue },
+	{ &match_latejoin, "match_latejoin", "1", 0, 0, qfalse, qfalse },
+	{ &match_minplayers, "match_minplayers", "2", 0, 0, qfalse, qfalse },
+	{ &match_readypercent, "match_readypercent", "100", 0, 0, qfalse, qtrue },
+	{ &match_timeoutlength, "match_timeoutlength", "180", 0, 0, qfalse, qtrue },
+	{ &match_timeoutcount, "match_timeoutcount", "3", 0, 0, qfalse, qtrue },
+	{ &g_allowPMs, "g_allowPMs", "1", CVAR_ARCHIVE, 0, qfalse },
+	{ &team_nocontrols, "team_nocontrols", "1", CVAR_ARCHIVE, 0, qfalse },
+
 };
 
 // bk001129 - made static to avoid aliasing

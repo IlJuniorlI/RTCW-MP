@@ -4086,3 +4086,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	s->teamNum = ps->teamNum;
 	s->aiState = ps->aiState;
 }
+
+// L0 - Reinforcements offset
+const unsigned int aReinfSeeds[MAX_REINFSEEDS] = { 11, 3, 13, 7, 2, 5, 1, 17 };
+// L0 - Stats (It matches extWeaponStats_t in bg_public.h)

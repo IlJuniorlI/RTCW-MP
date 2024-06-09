@@ -479,6 +479,8 @@ typedef struct {
 	int latchPlayerItem;            // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerSkin;            // DHM - Nerve :: for GT_WOLF not archived
 
+	int selectedWeapon; // If enabled allows mp40, sten, thompson..
+
 	// OSP port
 	int damage_given;
 	int damage_received;
@@ -517,6 +519,8 @@ typedef struct {
 
 	int clientFlags;		// Sort some stuff based upon user settings
 	int specSpeed;
+	qboolean muted;
+	char ip[47];		// IP
 
 } clientSession_t;
 
@@ -593,6 +597,9 @@ typedef struct {
 	unsigned int clientFlags;           // Client settings that need server involvement
 	unsigned int clientMaxPackets;      // Client com_maxpacket settings
 	unsigned int clientTimeNudge;       // Client cl_timenudge settings
+	int cmd_debounce;                   // Dampening of command spam
+	qboolean teamInfo;              // send team overlay updates?
+	qboolean ready;
 } clientPersistant_t;
 
 //unlagged - backward reconciliation #1
@@ -887,8 +894,27 @@ typedef struct {
 	int			frameStartTime;
 	//unlagged - backward reconciliation #4
 
-	// OSP Stats
-	int sortedStats[MAX_CLIENTS];	// sorted by weapon stats
+// L0 - New stuff
+	int axisLeft;		// For DM
+	int alliedLeft;		// For DM
+	int dwBlueReinfOffset;	// Reinforcements offset
+	int dwRedReinfOffset;	// Reinforcements offset
+	int	axisPlayers;		// For auto lock and auto team balance
+	int alliedPlayers;		// For auto lock and auto team balance
+	int taken;			// Flag retaking
+	int balanceTimer;	// Auto balance teams timer
+	qboolean fResetStats; // OSP Stats
+
+	// Countdown
+	qboolean	cnStarted;
+	int			cnPush;
+	int			cnNum;
+
+	// Weapons restrictions
+	int axisSniper, alliedSniper;
+	int axisPF, alliedPF;
+	int axisVenom, alliedVenom;
+	int axisFlamer, alliedFlamer;
 
 	// Pause
 	int paused;
@@ -898,7 +924,29 @@ typedef struct {
 	int alliedTimeouts;
 	qboolean axisCalledTimeout;
 	qboolean autoPaused;
+
+	// OSP Stats
+	int sortedStats[MAX_CLIENTS];	// sorted by weapon stats
+
+	// Map Achievers
+	int topAchiever;
+	char *topAchieverPlayer;
+
+	// Ready
+	qboolean ref_allready;                  // Referee forced match start
+	qboolean readyAll;
+	qboolean readyPrint;
+	qboolean readyTeam[TEAM_NUM_TEAMS];
 } level_locals_t;
+
+// OSPx - Team extras
+typedef struct {
+	qboolean spec_lock;
+	qboolean team_lock;
+	char team_name[24];
+	int timeouts;
+} team_info;
+// -OSP
 
 extern qboolean reloading;                  // loading up a savegame
 // JPW NERVE
@@ -1612,6 +1660,23 @@ typedef enum
 	shard_rubble
 } shards_t;
 
+#define CMD_DEBOUNCE    5000    // 5s between cmds
+
+// Pause
+#define PAUSE_NONE		0x00	// Match is not paused..
+#define PAUSE_UNPAUSING 0x02    // Pause is about to expire
+// Ready
+#define READY_NONE		0x00	// Countdown, playing..
+#define READY_AWAITING	0x01	// Awaiting all to ready up..
+#define READY_PENDING	0x02	// Awaiting but can start once treshold (minclients) is reached..
+
+// Stats
+#define EOM_WEAPONSTATS 0x01    // Dump of player weapon stats at end of match.
+#define EOM_MATCHINFO   0x02    // Dump of match stats at end of match.
+
+#define AA_STATSALL     0x01    // Client AutoAction: Dump ALL player stats
+#define AA_STATSTEAM    0x02    // Client AutoAction: Dump TEAM player stats
+
 // g_antilag.c
 void G_StoreClientPosition( gentity_t* ent );
 void G_HistoricalTrace( gentity_t* ent, trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask );
@@ -1648,6 +1713,9 @@ void G_gameStatsPrint(gentity_t* ent);
 #define AA_STATSALL     0x01    // Client AutoAction: Dump ALL player stats
 #define AA_STATSTEAM    0x02    // Client AutoAction: Dump TEAM player stats
 
+extern char *aTeams[TEAM_NUM_TEAMS];
+extern team_info teamInfo[TEAM_NUM_TEAMS];
+
 // NERVE - SMF
 extern vmCvar_t g_warmupLatch;
 extern vmCvar_t g_nextTimeLimit;
@@ -1663,3 +1731,46 @@ extern vmCvar_t g_altStopwatchMode;
 extern vmCvar_t g_gamestate;
 extern vmCvar_t g_swapteams;
 // -NERVE - SMF
+
+extern vmCvar_t g_spawnOffset; // random spawn offset for both teams, between 1 and cvar integer - 1
+
+// Weapon/class stuff
+extern vmCvar_t	g_ltNades;
+extern vmCvar_t	g_medicNades;
+extern vmCvar_t	g_soldNades;
+extern vmCvar_t	g_engNades;
+extern vmCvar_t	g_medicClips;
+extern vmCvar_t	g_engineerClips;
+extern vmCvar_t	g_soldierClips;
+extern vmCvar_t	g_leutClips;
+extern vmCvar_t	g_pistolClips;
+extern vmCvar_t g_lifeStats;
+extern vmCvar_t g_maxTeamPF;
+extern vmCvar_t g_maxTeamSniper;
+extern vmCvar_t g_maxTeamVenom;
+extern vmCvar_t g_maxTeamFlamer;
+
+extern vmCvar_t match_warmupDamage;
+extern vmCvar_t match_mutespecs;
+extern vmCvar_t match_latejoin;
+extern vmCvar_t match_minplayers;
+extern vmCvar_t match_readypercent;
+extern vmCvar_t match_timeoutlength;
+extern vmCvar_t	g_spectatorAllowDemo;
+extern vmCvar_t match_timeoutcount;
+
+extern vmCvar_t g_allowPMs;
+extern vmCvar_t team_nocontrols;
+extern vmCvar_t g_tournament;
+
+/**
+ * @enum enum_t_dp
+ * @brief "Delayed Print" ent enumerations
+ */
+typedef enum
+{
+	DP_PAUSEINFO = 0,   ///< Print current pause info
+	DP_UNPAUSING,       ///< Print unpause countdown + unpause
+	DP_CONNECTINFO,     ///< Display info on connect
+	DP_MVSPAWN          ///< Set up MV views for clients who need them
+} enum_t_dp;

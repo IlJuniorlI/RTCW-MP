@@ -78,11 +78,11 @@ void G_loadMatchGame(void)
 
 	trap_SetConfigstring(CS_REINFSEEDS, strReinfSeeds);
     // write first respawn time
-    if (g_gameStatslog.integer && g_gamestate.integer == GS_PLAYING) {
+    /*if (g_gameStatslog.integer && g_gamestate.integer == GS_PLAYING) {
         gentity_t *dummy = g_entities;
 
         G_writeGeneralEvent(dummy,dummy,"",teamFirstSpawn);
-    }
+    }*/
 }
 
 /*
@@ -322,7 +322,7 @@ void G_handlePause(qboolean dPause, int time) {
  * @param[in] cv
  * @return
  */
-int G_checkServerToggle(vmCvar_t *cv)
+/*int G_checkServerToggle(vmCvar_t *cv)
 {
 	int nFlag;
 
@@ -367,7 +367,7 @@ int G_checkServerToggle(vmCvar_t *cv)
 	}
 
 	return qtrue;
-}
+}*/
 
 /*
 =================
