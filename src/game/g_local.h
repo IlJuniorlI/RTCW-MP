@@ -564,8 +564,6 @@ typedef struct {
 
 	int lastReinforceTime;              // DHM - Nerve :: last reinforcement
 
-	qboolean teamInfo;              // send team overlay updates?
-
 	//unlagged - client options
 	// these correspond with variables in the userinfo string
 	int			delag;
