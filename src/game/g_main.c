@@ -170,6 +170,24 @@ vmCvar_t	g_lightningDamage;
 vmCvar_t	sv_fps;
 //unlagged - server options
 
+vmCvar_t sv_hostname;	// So it's more accesible
+
+// NERVE - SMF
+vmCvar_t g_warmupLatch;
+vmCvar_t g_nextTimeLimit;
+vmCvar_t g_preciseTimeSet;
+vmCvar_t g_usePreciseConsoleTime;
+vmCvar_t g_showHeadshotRatio;
+vmCvar_t g_userTimeLimit;
+vmCvar_t g_userAlliedRespawnTime;
+vmCvar_t g_userAxisRespawnTime;
+vmCvar_t g_currentRound;
+vmCvar_t g_noTeamSwitching;
+vmCvar_t g_altStopwatchMode;
+vmCvar_t g_gamestate;
+vmCvar_t g_swapteams;
+// -NERVE - SMF
+
 cvarTable_t gameCvarTable[] = {
 	// don't override the cheat state set by the system
 	{ &g_cheats, "sv_cheats", "", 0, qfalse },
@@ -312,6 +330,9 @@ cvarTable_t gameCvarTable[] = {
 	// it's CVAR_SYSTEMINFO so the client's sv_fps will be automagically set to its value
 	{ &sv_fps, "sv_fps", "20", CVAR_SYSTEMINFO | CVAR_ARCHIVE, 0, qfalse },
 	//unlagged - server options
+
+	{ &sv_hostname, "sv_hostname", "", CVAR_SERVERINFO, 0, qfalse },
+	{ &g_usePreciseConsoleTime, "g_usePreciseConsoleTime", "1", CVAR_WOLFINFO, 0, qfalse  },
 };
 
 // bk001129 - made static to avoid aliasing
@@ -1807,6 +1828,9 @@ void BeginIntermission( void ) {
 
 	// send the current scoring to all clients
 	SendScoreboardMessageToAllClients();
+
+	// End of Round Stats
+	G_matchInfoDump(EOM_MATCHINFO);
 
 }
 

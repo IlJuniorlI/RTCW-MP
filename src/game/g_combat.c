@@ -265,7 +265,14 @@ char    *modNames[] = {
 	"MOD_ENGINEER",  // not sure if we'll use
 	"MOD_MEDIC",     // these like this or not
 // jpw
-	"MOD_BAT"
+	"MOD_BAT",
+
+// OSPx
+	"MOD_ADMKILL",
+	"MOD_SELFKILL",
+	"MOD_SWITCHTEAM",
+	"MOD_NUM_MODS"
+// -OSPx
 };
 
 /*

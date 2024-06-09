@@ -449,6 +449,16 @@ typedef struct {
 #define FOLLOW_ACTIVE1  -1
 #define FOLLOW_ACTIVE2  -2
 
+// L0 - OSP stats port - weapon stat counters
+typedef struct {
+	unsigned int atts;
+	unsigned int deaths;
+	unsigned int headshots;
+	unsigned int hits;
+	unsigned int kills;
+} weapon_stat_t;
+// End
+
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
 // time and reading them back at connection time.  Anything added here
@@ -468,6 +478,46 @@ typedef struct {
 	int latchPlayerWeapon;          // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerItem;            // DHM - Nerve :: for GT_WOLF not archived
 	int latchPlayerSkin;            // DHM - Nerve :: for GT_WOLF not archived
+
+	// OSP port
+	int damage_given;
+	int damage_received;
+	int deaths;
+	int kills;
+	int rounds;
+	int suicides;
+	int team_damage;
+	int team_kills;
+
+	// referee
+	int referee, status, shoutcaster;
+	int spec_invite, specInvited, specLocked;
+
+	// New ones
+	int headshots;
+	int med_given;
+	int ammo_given;
+	int gibs;
+	int poisoned;
+	int revives;
+	int acc_shots;  // Overall acc
+	int acc_hits;	// -||-
+	int killPeak;
+	int knifeKills;
+	int obj_captured;
+	int obj_destroyed;
+	int obj_returned;
+	int obj_taken;
+	int obj_checkpoint;
+	int obj_killcarrier;
+	int obj_protectflag;
+	int dyn_planted;
+	int dyn_defused;
+	weapon_stat_t aWeaponStats[WS_MAX + 1];   // Weapon stats.  +1 to avoid invalid weapon check
+
+	int clientFlags;		// Sort some stuff based upon user settings
+	int specSpeed;
+
 } clientSession_t;
 
 //
@@ -526,6 +576,23 @@ typedef struct {
 	//unlagged - true ping
 
 	qboolean bAutoReloadAux; // TTimo - auxiliary storage for pmoveExt_t::bAutoReload, to achieve persistance
+
+	// Life stats
+	int life_acc_shots;
+	int life_acc_hits;
+	int life_headshots;
+	int life_kills;
+	int life_gibs;
+	unsigned int int_stats;
+	unsigned int int_statsType;
+//	unsigned int int_dragBodies;
+	unsigned int int_selectedWeapon;
+
+	// L0
+	unsigned int autoaction;            // End-of-match auto-requests
+	unsigned int clientFlags;           // Client settings that need server involvement
+	unsigned int clientMaxPackets;      // Client com_maxpacket settings
+	unsigned int clientTimeNudge;       // Client cl_timenudge settings
 } clientPersistant_t;
 
 //unlagged - backward reconciliation #1
@@ -819,6 +886,18 @@ typedef struct {
 	// actual time this server frame started
 	int			frameStartTime;
 	//unlagged - backward reconciliation #4
+
+	// OSP Stats
+	int sortedStats[MAX_CLIENTS];	// sorted by weapon stats
+
+	// Pause
+	int paused;
+	int timeCurrent;	// Real game clock
+	int timeDelta;
+	int axisTimeouts;
+	int alliedTimeouts;
+	qboolean axisCalledTimeout;
+	qboolean autoPaused;
 } level_locals_t;
 
 extern qboolean reloading;                  // loading up a savegame
@@ -1250,6 +1329,8 @@ extern vmCvar_t g_smoothClients;
 extern vmCvar_t pmove_fixed;
 extern vmCvar_t pmove_msec;
 
+extern vmCvar_t	sv_hostname;
+
 //unlagged - server options
 // some new server-side variables
 extern	vmCvar_t	g_delagHitscan;
@@ -1535,3 +1616,50 @@ typedef enum
 void G_StoreClientPosition( gentity_t* ent );
 void G_HistoricalTrace( gentity_t* ent, trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask );
 void G_ResetMarkers( gentity_t* ent );
+
+// g_stats.c
+void doSound(gentity_t *ent, int type, char *path, char *sound);
+void doubleKill (gentity_t *ent, int meansOfDeath );
+void KillingSprees ( gentity_t *ent, int score );
+void deathSpree ( gentity_t *ent );
+void killerSpree(gentity_t *ent, int score);
+void FirstHeadshot (gentity_t *attacker, gentity_t *targ);
+void FirstBlood (gentity_t *self, gentity_t *attacker);
+unsigned int G_weapStatIndex_MOD( int iWeaponMOD );
+void G_statsPrint( gentity_t *ent, int nType );
+void G_addStats( gentity_t *targ, gentity_t *attacker, int dmg_ref, int mod );
+void G_addStatsHeadShot( gentity_t *attacker, int mod );
+char *G_createStats(gentity_t* refEnt);
+void G_deleteStats( int nClient );
+void G_parseStats( char *pszStatsInfo );
+char *G_writeStats( gclient_t* client );
+char *G_createClientStats( gentity_t *refEnt );
+void G_clientStatsPrint( gentity_t *ent, int nType, qboolean toWindow );
+void G_weaponStatsLeaders_cmd( gentity_t* ent, qboolean doTop, qboolean doWindow );
+void G_weaponRankings_cmd( gentity_t *ent, unsigned int dwCommand, qboolean state );
+void G_printMatchInfo( gentity_t *ent, qboolean fDump );
+void G_matchInfoDump( unsigned int dwDumpType );
+void G_statsall_cmd( gentity_t *ent, unsigned int dwCommand, qboolean fDump );
+void G_gameStatsPrint(gentity_t* ent);
+
+// Stats
+#define EOM_WEAPONSTATS 0x01    // Dump of player weapon stats at end of match.
+#define EOM_MATCHINFO   0x02    // Dump of match stats at end of match.
+#define AA_STATSALL     0x01    // Client AutoAction: Dump ALL player stats
+#define AA_STATSTEAM    0x02    // Client AutoAction: Dump TEAM player stats
+
+// NERVE - SMF
+extern vmCvar_t g_warmupLatch;
+extern vmCvar_t g_nextTimeLimit;
+extern vmCvar_t g_preciseTimeSet;	// RTCWPro precise timelimit set each round
+extern vmCvar_t g_usePreciseConsoleTime;
+extern vmCvar_t g_showHeadshotRatio;
+extern vmCvar_t g_userTimeLimit;
+extern vmCvar_t g_userAlliedRespawnTime;
+extern vmCvar_t g_userAxisRespawnTime;
+extern vmCvar_t g_currentRound;
+extern vmCvar_t g_noTeamSwitching;
+extern vmCvar_t g_altStopwatchMode;
+extern vmCvar_t g_gamestate;
+extern vmCvar_t g_swapteams;
+// -NERVE - SMF
